@@ -23,21 +23,17 @@ html,body{margin:0;height:100%;overflow:hidden;background:linear-gradient(180deg
 body.smooth #c{image-rendering:auto}
 #ui,#scr,#hud{position:fixed;inset:0;pointer-events:none}
 .ov,.b,.box,.pn,.card,#joy,#jb,input,.pc,.hc,.sw,.ag div{pointer-events:auto}
-/* ---------- Buttons ---------- */
 .b{font:600 16px var(--px);padding:10px 18px;background:#fff;color:var(--d);border:0;border-radius:16px;box-shadow:var(--shadow-btn);cursor:pointer;margin:4px;transition:transform .08s,box-shadow .08s,filter .15s;letter-spacing:.3px}
 .b:hover{filter:brightness(1.05)}.b:active{transform:translateY(4px);box-shadow:0 1px 0 #b4d3ec}
 .b.y{background:linear-gradient(#ffe479,#ffc21f);box-shadow:0 5px 0 #d49400,0 9px 16px rgba(31,42,90,.16)}.b.y:active{box-shadow:0 1px 0 #d49400}
 .b.on{background:linear-gradient(#72d6ff,#2ba6f0);color:#fff;box-shadow:0 5px 0 #1479b8,0 9px 16px rgba(31,42,90,.16)}
 .b[disabled]{opacity:.45;pointer-events:none}
-/* ---------- Panels ---------- */
 .pn{background:rgba(255,255,255,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:20px;box-shadow:var(--shadow-panel);padding:10px 16px;border:1px solid rgba(255,255,255,.6)}
-/* ---------- Title ---------- */
 #ttl{position:fixed;top:3vh;left:0;right:0;text-align:center;animation:fl 3.2s ease-in-out infinite;pointer-events:none}
 #ttl h1{margin:0;font:700 clamp(30px,6.4vw,68px) var(--px);color:#fff;letter-spacing:1px;text-shadow:0 4px 0 #2a8fe0,0 8px 0 #1f2a5a,0 16px 26px rgba(31,42,90,.35)}
 #ttl h1 i{color:var(--y);font-style:normal;text-shadow:0 4px 0 #c47f00,0 8px 0 #1f2a5a,0 16px 26px rgba(31,42,90,.35)}
 #ttl p{display:inline-block;margin:20px 0 0;padding:4px 20px;font:600 clamp(12px,1.8vw,18px) var(--px);letter-spacing:4px;color:var(--d);background:rgba(255,255,255,.75);border-radius:99px;box-shadow:0 4px 0 rgba(31,42,90,.15)}
 @keyframes fl{50%{transform:translateY(-7px)}}
-/* ---------- Menu side ---------- */
 .side{position:fixed;right:4vw;top:50%;transform:translateY(-45%);display:flex;flex-direction:column;align-items:stretch;gap:6px;width:min(250px,34vw)}
 .side .nm{font:700 20px var(--px);color:var(--d);text-align:center;background:#fff;border-radius:99px;padding:6px 14px;box-shadow:0 5px 0 #b4d3ec;margin-bottom:10px;word-break:break-all}
 .play{width:min(120px,24vw);height:min(120px,24vw);align-self:center;border:0;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff3a0,#ffc21f 58%,#f29a00);box-shadow:0 8px 0 #c47f00,0 16px 26px rgba(31,42,90,.3);cursor:pointer;position:relative;animation:pp 1.5s ease-in-out infinite;pointer-events:auto}
@@ -45,7 +41,6 @@ body.smooth #c{image-rendering:auto}
 .play:active{transform:scale(.92)}
 @keyframes pp{50%{transform:scale(1.07)}}
 .pt{font:700 20px var(--px);color:#fff;text-align:center;letter-spacing:5px;text-shadow:0 3px 0 #2a8fe0,0 5px 8px rgba(31,42,90,.3);margin:6px 0 10px}
-/* ---------- Overlay ---------- */
 .ov{position:fixed;inset:0;background:rgba(31,42,90,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;animation:fi .25s;z-index:50}
 .box{background:#fff;border-radius:26px;box-shadow:0 14px 40px rgba(31,42,90,.35);padding:22px;max-width:min(520px,92vw);max-height:92vh;overflow:auto;text-align:center;animation:pop .28s cubic-bezier(.3,1.5,.5,1)}
 .box h3{font:700 24px var(--px);margin:0 0 12px;color:var(--d)}
@@ -55,32 +50,26 @@ input[type=text]:focus{border-color:var(--s)}
 .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin:8px 0}
 .err{color:#e0334a;min-height:20px;font-size:14px;line-height:1.4;font-weight:700}
 @keyframes fi{from{opacity:0}}@keyframes pop{from{transform:scale(.8);opacity:0}}
-/* ---------- Setting / Skin ---------- */
 .panel{position:fixed;right:3vw;top:50%;transform:translateY(-45%);width:min(340px,46vw);max-height:84vh;overflow:auto;text-align:center}
 .panel h3{font:700 22px var(--px);margin:0 0 10px}
 .sw{width:36px;height:36px;border:3px solid #fff;border-radius:50%;box-shadow:0 3px 0 rgba(31,42,90,.25);display:inline-block;margin:3px;cursor:pointer;transition:transform .1s}.sw:hover{transform:scale(1.15)}
 .ag{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
 .ag div{border:3px solid transparent;border-radius:14px;background:#eef8ff;padding:2px;cursor:pointer;font-size:11px;font-weight:700}.ag div.on{background:#fff6cf;border-color:var(--y)}
 input[type=range]{width:100%;height:30px;accent-color:var(--s);touch-action:auto;pointer-events:auto}
-/* ---------- Loading ---------- */
 .ld{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font:700 22px var(--px);color:#fff;text-shadow:0 3px 0 #2a8fe0;background:linear-gradient(180deg,var(--bg1),var(--bg3));z-index:80}
 .bar{width:min(260px,60vw);height:18px;border-radius:99px;background:rgba(255,255,255,.6);overflow:hidden}.bar i{display:block;height:100%;width:35%;border-radius:99px;background:linear-gradient(90deg,#ffd23f,#ff7eb6);animation:ba 1s ease-in-out infinite alternate}
 @keyframes ba{from{margin-left:0}to{margin-left:65%}}
-/* ---------- Cards (mode select) ---------- */
 .cards{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;gap:3vw;flex-wrap:nowrap;padding:0 4vw}
 .card{width:min(240px,28vw);padding:20px 12px;background:#fff;border-radius:26px;box-shadow:0 8px 0 #b4d3ec,0 16px 30px rgba(31,42,90,.2);text-align:center;cursor:pointer;opacity:0;animation:ci .6s cubic-bezier(.3,1.4,.5,1) forwards;transition:transform .15s}
 .card:hover{transform:translateY(-8px) rotate(-1deg)}.card h4{font:700 20px var(--px);margin:12px 0 6px}.card small{font-size:14px;line-height:1.4;display:block;font-family:var(--nu);font-weight:600}
 @keyframes ci{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:none}}
 .bk{position:fixed;left:3vw;bottom:4vh}
-/* ---------- Lobby ---------- */
 .lb{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;padding:2vh 3vw;gap:1.5vh;overflow:auto;pointer-events:none}
 .hc{background:#fff;border-radius:22px;padding:10px 26px;text-align:center;box-shadow:0 6px 0 #b4d3ec}
 .pl{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .pc{position:relative;background:#fff;border-radius:18px;padding:10px;width:128px;text-align:center;font-size:14px;font-weight:700;line-height:1.5;box-shadow:0 5px 0 #b4d3ec}
 .pc .x{position:absolute;left:-6px;top:-6px;width:26px;height:26px;background:#ff5a6e;color:#fff;border:3px solid #fff;border-radius:50%;font:700 12px var(--px);cursor:pointer;line-height:12px;padding:0}
-/* ---------- Countdown ---------- */
 .cd{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font:700 min(30vw,220px) var(--px);color:#fff;text-shadow:0 8px 0 #2a8fe0,0 16px 0 #1f2a5a;animation:pop .5s;pointer-events:none;z-index:40}
-/* ---------- HUD ---------- */
 #hud{display:none}
 #cc,#hp{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);text-align:center;font:600 16px var(--px)}
 #top{position:fixed;top:8px;left:50%;transform:translateX(-50%);font:700 18px var(--px);padding:6px 20px;text-align:center}
@@ -89,12 +78,10 @@ input[type=range]{width:100%;height:30px;accent-color:var(--s);touch-action:auto
 #inv{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);max-width:62vw;display:flex;gap:6px;overflow-x:auto;padding:8px;touch-action:pan-x}
 #inv .b{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;padding:6px 8px;min-width:64px;margin:0 0 5px;white-space:nowrap;box-shadow:0 4px 0 #b4d3ec}
 #ctx{position:fixed;left:50%;bottom:104px;transform:translateX(-50%);display:none}
-/* ---------- Mobile controls ---------- */
 #joy{position:fixed;left:3vw;bottom:5vh;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.3);border:4px solid rgba(255,255,255,.85);display:none}
 #joy i{position:absolute;left:35px;top:35px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#a5e3ff,#2ba6f0);border:4px solid #fff;box-shadow:0 4px 0 rgba(31,42,90,.25)}
 #jb{position:fixed;right:4vw;bottom:5vh;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3a0,#ffc21f);border:4px solid #fff;box-shadow:0 5px 0 #c47f00;font:700 14px var(--px);color:var(--d);display:none}
 .touch #joy,.touch #jb{display:block}
-/* ---------- Rotate warning ---------- */
 #rot{position:fixed;inset:0;background:linear-gradient(var(--bg1),var(--bg3));color:var(--d);font:700 20px var(--px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:99;text-align:center;line-height:1.6}
 #rot b{width:60px;height:100px;border:5px solid var(--d);border-radius:12px;animation:rt 2s ease-in-out infinite}
 @keyframes rt{50%{transform:rotate(90deg)}}
@@ -102,7 +89,6 @@ input[type=range]{width:100%;height:30px;accent-color:var(--s);touch-action:auto
 .panel,.panel *,.box,.box *{touch-action:pan-y}
 .panel input[type=range],.box input[type=range]{touch-action:pan-x}
 #nolib{position:fixed;inset:0;background:#fff;color:var(--d);font:700 18px var(--px);display:flex;align-items:center;justify-content:center;text-align:center;line-height:2;padding:20px;z-index:100}
-/* ---------- Fade transitions ---------- */
 #fade{position:fixed;inset:0;background:#070b2a;opacity:0;pointer-events:none;transition:opacity .35s;z-index:90}
 #fade.on{opacity:1}
 </style></head><body>
@@ -125,8 +111,14 @@ input[type=range]{width:100%;height:30px;accent-color:var(--s);touch-action:auto
 (()=>{
 if(!window.THREE){document.body.insertAdjacentHTML('beforeend','<div id="nolib">Gagal memuat three.js.<br>Hubungkan internet sekali, atau taruh three.min.js (r128) di folder lib/</div>');return}
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-const cfg={apiKey:"AIzaSyCU0hMMG0ZcY-sUcVYJoR2Z_Lvz_rObomk",authDomain:"fisika-suwarni.firebaseapp.com",
- databaseURL:"https://fisika-suwarni-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"fisika-suwarni",storageBucket:"fisika-suwarni.firebasestorage.app",messagingSenderId:"163597182103",appId:"1:163597182103:web:3fa3d53a9022af791ff5d2"};
+/* === FIREBASE CONFIG BARU === */
+const cfg={apiKey:"AIzaSyBrcEg6Ddw8PLmKJxi8rf9-N7eGsy4AUFs",
+ authDomain:"meet-up-e1be8.firebaseapp.com",
+ databaseURL:"https://meet-up-e1be8-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"meet-up-e1be8",
+ storageBucket:"meet-up-e1be8.firebasestorage.app",
+ messagingSenderId:"47326775225",
+ appId:"1:47326775225:web:290a6644c0559ee2979868"};
 let S=Object.assign({color:'#4fc3f7',acc:0,gfx:2},JSON.parse(localStorage.fx||'{}'));const save=()=>localStorage.fx=JSON.stringify(S);
 let fb=!!window.firebase,authErr=null,auth,db,uid='lokal-'+Math.random().toString(36).slice(2,8),off=0;
 if(fb){try{firebase.initializeApp(cfg);auth=firebase.auth();db=firebase.database();db.ref('.info/serverTimeOffset').on('value',s=>off=s.val()||0)}catch(e){fb=false;console.error('Firebase init error:',e)}}
@@ -138,6 +130,7 @@ if(/PERMISSION_DENIED|permission/i.test(c))return 'Akses ditolak. Tempel isi dat
 if(/unauthorized-domain/.test(c))return 'Domain belum diizinkan. Tambahkan domain game di Authentication > Settings > Authorized domains.';
 if(/timeout/.test(c))return 'Tidak ada respons dari Firebase. Cek internet, pastikan Realtime Database sudah dibuat dan databaseURL di index.html benar.';
 if(/network|offline/i.test(c))return 'Koneksi ke Firebase gagal. Cek internet Anda.';
+if(/api-key|invalid-api-key/i.test(c))return 'API key tidak valid. Periksa konfigurasi Firebase di index.html.';
 return 'Gagal: '+c}
 async function ensureAuth(){if(!fb)return 'Firebase tidak tersedia (offline).';if(auth.currentUser){uid=auth.currentUser.uid;return ''}try{const c=await T(auth.signInAnonymously());uid=c.user.uid;return ''}catch(e){console.error('Auth error:',e);return fbErr(e)}}
 function fade(on){const f=$('#fade');if(on)f.classList.add('on');else setTimeout(()=>f.classList.remove('on'),50)}
@@ -175,13 +168,10 @@ if(i==8){g.add(M(new Sp(1.04,16,8,0,6.283,0,.8),0xe53935,0,0,0));g.add(M(new B(.
 if(i==9){g.add(M(new C(.04,.04,.4,6),0x2e7d32,0,1.2,0));const a=M(new Sp(.22,8,6),0x66bb6a,.2,1.45,0);a.scale.set(1,.4,.6);const b=M(new Sp(.22,8,6),0x66bb6a,-.2,1.45,0);b.scale.set(1,.4,.6);g.add(a,b)}
 if(i==10){g.add(M(new C(.05,.05,.25,6),0x888888,0,1.1,0));const p=new THREE.Group();p.position.y=1.25;p.add(M(new B(1,.04,.14),0xffb300),M(new B(.14,.04,1),0xff7043));g.add(p);g.userData.spin=p}
 return g}
-/* Mata persegi panjang (rounded rect) */
 function eyeMat(){return new THREE.MeshStandardMaterial({color:0x1b1b2f,roughness:.4})}
 function makeEye(sx){const g=new THREE.Group();const r=0.09,w=0.26,h=0.4;
-const m=eyeMat();const box=new THREE.Mesh(new THREE.BoxGeometry(w,h,0.12),m);box.position.z=0;box.position.y=0;g.add(box);
-// sudut bulat: 4 tabung kecil
+const m=eyeMat();const box=new THREE.Mesh(new THREE.BoxGeometry(w,h,0.12),m);g.add(box);
 [[-w/2+r,h/2-r],[w/2-r,h/2-r],[-w/2+r,-h/2+r],[w/2-r,-h/2+r]].forEach(([x,y])=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(r,r,0.12,8),m);c.rotation.x=Math.PI/2;c.position.set(x,y,0);g.add(c)});
-// highlight kecil
 const hi=new THREE.Mesh(new THREE.BoxGeometry(.08,.12,.04),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.2}));hi.position.set(-.04,.1,.07);g.add(hi);
 const hi2=new THREE.Mesh(new THREE.BoxGeometry(.04,.06,.04),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.2}));hi2.position.set(.05,-.1,.07);g.add(hi2);
 g.position.set(sx,.55,.84);return g}
@@ -194,7 +184,6 @@ const sh=new THREE.Mesh(new THREE.CircleGeometry(1.08,14),new THREE.MeshBasicMat
 g.userData={b,eyes,A,sh,eL,eR};return g}
 function idle(j,s,w=0,h=0,q=0){const u=j.userData,k=Math.sin(s*2.4)*(1-w),st=Math.sin(s*26)*.03*w,sx=1-.03*k+q*.5-st;
 u.b.scale.set(sx,1+.05*k-q+st*1.5,sx);u.b.position.y=.04+h+Math.abs(Math.sin(s*13))*.13*w;u.b.rotation.z=Math.sin(s*13)*.13*w;u.b.rotation.x=.1*w;
-// kedip: mata mengecil vertikal
 const bl=(s%3.7<.12)?.15:1;u.eL.scale.y=u.eR.scale.y=bl;
 const c=1/(1+h*.25);u.sh.scale.set(c,c,c);u.sh.material.opacity=.22*c;
 if(u.A.userData.spin)u.A.userData.spin.rotation.y=s*18}
