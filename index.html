@@ -111,7 +111,7 @@ input[type=range]{width:100%;height:30px;accent-color:var(--s);touch-action:auto
 (()=>{
 if(!window.THREE){document.body.insertAdjacentHTML('beforeend','<div id="nolib">Gagal memuat three.js.<br>Hubungkan internet sekali, atau taruh three.min.js (r128) di folder lib/</div>');return}
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-/* === FIREBASE CONFIG BARU === */
+/* === FIREBASE CONFIG === */
 const cfg={apiKey:"AIzaSyBrcEg6Ddw8PLmKJxi8rf9-N7eGsy4AUFs",
  authDomain:"meet-up-e1be8.firebaseapp.com",
  databaseURL:"https://meet-up-e1be8-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -123,7 +123,8 @@ let S=Object.assign({color:'#4fc3f7',acc:0,gfx:2},JSON.parse(localStorage.fx||'{
 let fb=!!window.firebase,authErr=null,auth,db,uid='lokal-'+Math.random().toString(36).slice(2,8),off=0;
 if(fb){try{firebase.initializeApp(cfg);auth=firebase.auth();db=firebase.database();db.ref('.info/serverTimeOffset').on('value',s=>off=s.val()||0)}catch(e){fb=false;console.error('Firebase init error:',e)}}
 const now=()=>Date.now()+off;
-const T=(p,ms=9000)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r({code:'timeout'}),ms))]);
+/* Timeout lebih panjang + bisa dipakai berulang */
+const T=(p,ms=15000)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r({code:'timeout'}),ms))]);
 function fbErr(e){const c=String((e&&(e.code||e.message))||e);
 if(/operation-not-allowed|admin-restricted/.test(c))return 'Login Anonymous belum aktif. Firebase Console > Authentication > Sign-in method > Anonymous > Enable.';
 if(/PERMISSION_DENIED|permission/i.test(c))return 'Akses ditolak. Tempel isi database.rules.json di Realtime Database > Rules lalu Publish.';
@@ -131,8 +132,26 @@ if(/unauthorized-domain/.test(c))return 'Domain belum diizinkan. Tambahkan domai
 if(/timeout/.test(c))return 'Tidak ada respons dari Firebase. Cek internet, pastikan Realtime Database sudah dibuat dan databaseURL di index.html benar.';
 if(/network|offline/i.test(c))return 'Koneksi ke Firebase gagal. Cek internet Anda.';
 if(/api-key|invalid-api-key/i.test(c))return 'API key tidak valid. Periksa konfigurasi Firebase di index.html.';
+if(/database.*(not found|does not exist)/i.test(c))return 'Realtime Database belum dibuat di proyek ini. Buka Firebase Console > Realtime Database > Create Database.';
 return 'Gagal: '+c}
-async function ensureAuth(){if(!fb)return 'Firebase tidak tersedia (offline).';if(auth.currentUser){uid=auth.currentUser.uid;return ''}try{const c=await T(auth.signInAnonymously());uid=c.user.uid;return ''}catch(e){console.error('Auth error:',e);return fbErr(e)}}
+/* Pastikan auth siap & tidak dobel login */
+let authPromise=null;
+async function ensureAuth(){
+  if(!fb)return 'Firebase tidak tersedia (offline).';
+  if(auth.currentUser){uid=auth.currentUser.uid;return ''}
+  if(authPromise){try{await authPromise}catch(e){return fbErr(e)};if(auth.currentUser){uid=auth.currentUser.uid;return ''}return 'Login gagal.'}
+  try{
+    authPromise=T(auth.signInAnonymously(),20000);
+    const c=await authPromise;
+    uid=c.user.uid;
+    return '';
+  }catch(e){
+    console.error('Auth error:',e);
+    return fbErr(e);
+  }finally{
+    authPromise=null;
+  }
+}
 function fade(on){const f=$('#fade');if(on)f.classList.add('on');else setTimeout(()=>f.classList.remove('on'),50)}
 const ACC=['Polos','Mahkota','Topi Tinggi','Antena','Tanduk','Halo','Pita','Kacamata','Topi Baseball','Tunas','Baling-baling'];
 const GF=[{n:'Kentank',d:'Super datar, dekorasi lingkungan sangat sedikit, jarak render sangat dekat.',pr:.28,sh:0,far:24,dec:0},
@@ -209,14 +228,26 @@ const TT='<div id="ttl"><h1>GAME FISIKA <i>XII</i></h1><p>by suwarni</p></div>';
 const SV={1:'<path d="M30 34L35 18 43 28 50 14 57 28 65 18 70 34Z" fill="#ffc400"/>',2:'<rect x="38" y="6" width="24" height="24" fill="#222"/><rect x="26" y="28" width="48" height="5" fill="#222"/>',3:'<path d="M50 30V12" stroke="#555" stroke-width="3"/><circle cx="50" cy="10" r="5" fill="#f33"/>',4:'<path d="M28 36L20 16 38 30ZM72 36L80 16 62 30Z" fill="#e53935"/>',5:'<ellipse cx="50" cy="20" rx="18" ry="5" fill="none" stroke="#ffc400" stroke-width="4"/>',6:'<path d="M62 30L80 20V40ZM62 30L44 20V40Z" fill="#f06292"/>',7:'<circle cx="38" cy="52" r="10" fill="none" stroke="#111" stroke-width="3"/><circle cx="62" cy="52" r="10" fill="none" stroke="#111" stroke-width="3"/>',8:'<path d="M26 40A24 24 0 0 1 74 40Z" fill="#e53935"/><rect x="60" y="36" width="28" height="5" fill="#b71c1c"/>',9:'<path d="M50 32V16" stroke="#2e7d32" stroke-width="3"/><ellipse cx="42" cy="14" rx="9" ry="4" fill="#66bb6a"/><ellipse cx="58" cy="14" rx="9" ry="4" fill="#66bb6a"/>',10:'<rect x="47" y="22" width="6" height="10" fill="#888"/><rect x="26" y="18" width="48" height="4" fill="#ffb300"/>'};
 const jsvg=(c,a,w)=>`<svg viewBox="0 0 100 80" width="${w}" style="overflow:visible"><polygon points="10,70 15.4,50 30,35.4 50,30 70,35.4 84.6,50 90,70" fill="${c}" stroke="#1f2a5a" stroke-width="3" stroke-linejoin="round"/><polygon points="50,30 70,35.4 84.6,50 90,70 50,70" fill="#000" opacity=".13"/><polygon points="15.4,50 30,35.4 50,30 42,46" fill="#fff" opacity=".3"/><rect x="30" y="44" width="12" height="18" rx="4" fill="#1f2a5a"/><rect x="58" y="44" width="12" height="18" rx="4" fill="#1f2a5a"/><rect x="33" y="47" width="3" height="5" rx="1" fill="#fff"/><rect x="61" y="47" width="3" height="5" rx="1" fill="#fff"/>${SV[a]||''}</svg>`;
 /* ---------- Boot ---------- */
-function boot(){ui('<div class="ld">Memeriksa login...<div class="bar"><i></i></div></div>');setGame();gfx();setJ();
-const go=()=>{ if(S.name)menu();else askName()};
-if(!fb){setTimeout(go,600);return}
-const t=setTimeout(go,6000);let done=0;const fin=()=>{if(done)return;done=1;clearTimeout(t);go()};
-auth.onAuthStateChanged(u=>{if(u){uid=u.uid;fin()}else auth.signInAnonymously().catch(e=>{authErr=e;console.error('Auth error:',e);fin()})})}
+function boot(){
+  ui('<div class="ld">Memeriksa login...<div class="bar"><i></i></div></div>');
+  setGame();gfx();setJ();
+  const go=()=>{ if(S.name)menu();else askName()};
+  if(!fb){setTimeout(go,600);return}
+  let done=0;
+  const fin=()=>{if(done)return;done=1;go()};
+  /* Langsung cek currentUser, jangan tunggu onAuthStateChanged lama */
+  if(auth.currentUser){uid=auth.currentUser.uid;setTimeout(go,300);return}
+  const t=setTimeout(go,9000);
+  auth.onAuthStateChanged(u=>{
+    if(u){uid=u.uid;clearTimeout(t);fin()}
+  },e=>{
+    console.error('onAuthStateChanged error:',e);
+    clearTimeout(t);fin();
+  });
+}
 function askName(){ui(TT);const d=dlg('<h3>Siapa namamu?</h3><p>Nama ini jadi nama karakter Jello kamu.</p><input type="text" maxlength="12" placeholder="Username"><div class="err"></div>',[['Mulai',null,'y']]);
 const b=d.querySelector('.bt button'),i=d.querySelector('input');d.querySelector('.bt').replaceChildren(b);
-b.onclick=()=>{const v=i.value.trim().slice(0,12);if(v.length<2){d.querySelector('.err').textContent='Minimal 2 karakter.';return}S.name=v;save();if(fb)try{db.ref('users/'+uid).set({name:v}).catch(()=>{})}catch(e){}d.remove();setJ();menu()}}
+b.onclick=()=>{const v=i.value.trim().slice(0,12);if(v.length<2){d.querySelector('.err').textContent='Minimal 2 karakter.';return}S.name=v;save();if(fb&&auth.currentUser)try{db.ref('users/'+uid).set({name:v}).catch(()=>{})}catch(e){}d.remove();setJ();menu()}}
 function menu(){inGame=false;sc=sM;$('#hud').style.display='none';fade(false);ui(TT+`<div class="side"><div class="nm">${esc(S.name)}</div><button class="play" id="pl" aria-label="Play"></button><div class="pt">PLAY</div><button class="b" id="sk">Ganti Skin</button><button class="b" id="st">Setting</button></div>`);
 $('#pl').onclick=play;$('#sk').onclick=skin;$('#st').onclick=setting}
 function skin(){const sw=['#4fc3f7','#ff6b6b','#ffd93d','#6bcb77','#c77dff','#ff9f43','#ffffff','#f783ac'];
@@ -235,12 +266,27 @@ const ex=()=>{d.querySelector('#ex').textContent=m=='g'?'Mode kelompok: pemain d
 d.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{m=b.dataset.m;d.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x==b));ex()});
 d.querySelector('#a1').onclick=()=>d.querySelector('#n1').textContent=n=Math.max(2,n-1);d.querySelector('#a2').onclick=()=>d.querySelector('#n1').textContent=n=Math.min(8,n+1);
 d.querySelector('#b1').onclick=()=>d.querySelector('#n2').textContent=dur=Math.max(1,dur-1);d.querySelector('#b2').onclick=()=>d.querySelector('#n2').textContent=dur=Math.min(30,dur+1)}
+/* Cari kode room unik, coba 5x */
+async function uniqueCode(){
+  for(let i=0;i<5;i++){
+    const c=gen();
+    try{
+      const s=await T(db.ref('rooms/'+c).once('value'));
+      if(!s.exists())return c;
+    }catch(e){
+      if(e&&e.code==='timeout')throw e;
+      // PERMISSION_DENIED bisa berarti rules belum publish, jangan ulangi
+      throw e;
+    }
+  }
+  return gen();
+}
 async function createRoom(m,n,dur){
-  const w=dlg('<p>Membuat room...</p>',[]);
+  const w=dlg('<p>Membuat room...<br><small>Menghubungkan ke Firebase</small></p>',[]);
   try{
     const er=await ensureAuth();
     if(er){w.remove();note(er);return}
-    code=gen();
+    code=await uniqueCode();
     const rr=db.ref('rooms/'+code);
     await T(rr.set({host:uid,hn:S.name,hc:S.color,ha:S.acc,mode:m,groups:n,dur,state:'lobby'}));
     rr.onDisconnect().remove();
@@ -249,21 +295,29 @@ async function createRoom(m,n,dur){
 }
 function joinDlg(){const d=dlg('<h3>Masuk Room</h3><input type="text" maxlength="5" placeholder="KODE ROOM" style="text-transform:uppercase"><div class="err"></div>',[['Batal'],['Masuk',null,'y']]);
 const bs=d.querySelectorAll('.bt button'),i=d.querySelector('input');bs[0].onclick=()=>d.remove();
-bs[1].onclick=async()=>{const c=i.value.trim().toUpperCase();if(c.length<4){d.querySelector('.err').textContent='Kode tidak valid.';return}
+bs[1].onclick=async()=>{
+  const c=i.value.trim().toUpperCase();
+  if(c.length<4){d.querySelector('.err').textContent='Kode tidak valid.';return}
+  const btn=bs[1];btn.disabled=true;btn.textContent='Menghubungkan...';
   try{
     const er=await ensureAuth();
-    if(er){d.querySelector('.err').textContent=er;return}
+    if(er){d.querySelector('.err').textContent=er;btn.disabled=false;btn.textContent='Masuk';return}
     const s=await T(db.ref('rooms/'+c).once('value')),r=s.val();
-    if(!r){d.querySelector('.err').textContent='Kode tidak ditemukan.';return}
-    if(r.state!='lobby'){d.querySelector('.err').textContent='Game sudah dimulai.';return}
+    if(!r){d.querySelector('.err').textContent='Kode tidak ditemukan.';btn.disabled=false;btn.textContent='Masuk';return}
+    if(r.state!='lobby'){d.querySelector('.err').textContent='Game sudah dimulai.';btn.disabled=false;btn.textContent='Masuk';return}
     d.remove();code=c;
     if(r.mode=='g'){
       const g=dlg('<h3>Pilih Kelompok</h3><div class="row">'+Array.from({length:r.groups},(_,k)=>`<button class="b" data-g="${k+1}">${k+1}</button>`).join('')+'</div>',[['Batal']]);
       g.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{g.remove();joinAs(+b.dataset.g)})
     }else joinAs(0)
-  }catch(e){console.error('joinDlg error:',e);d.querySelector('.err').textContent=fbErr(e)}
+  }catch(e){
+    console.error('joinDlg error:',e);
+    d.querySelector('.err').textContent=fbErr(e);
+    btn.disabled=false;btn.textContent='Masuk';
+  }
 }}
-async function joinAs(g){const p=db.ref('rooms/'+code+'/players/'+uid);
+async function joinAs(g){
+  const p=db.ref('rooms/'+code+'/players/'+uid);
   try{
     await T(p.set({n:S.name,c:S.color,a:S.acc,g,r:0}));
     p.onDisconnect().remove();fade(true);setTimeout(()=>enter(false),350);
@@ -271,20 +325,39 @@ async function joinAs(g){const p=db.ref('rooms/'+code+'/players/'+uid);
 }
 function enter(h){isHost=h;started=0;mode='lobby';ref=db.ref('rooms/'+code);ref.on('value',onRoom);fade(false)}
 function cleanup(){if(ref){ref.off();ref=null}clearInterval(cdT);cdT=0}
-function onRoom(s){const r=s.val();if(!r){cleanup();leaveG();dlg('<p>Room ditutup oleh host.</p>',[['OK',menu]]);return}
-if(!isHost&&!(r.players&&r.players[uid])){cleanup();leaveG();dlg('<p>Kamu dikeluarkan dari room.</p>',[['OK',menu]]);return}RM=r;
-if(r.state=='lobby'){if(mode=='game'){leaveG();started=0}mode='lobby';lobby(r)}
-else if(r.state=='cd'&&!cdT){mode='cd';cdT=setInterval(()=>{const l=Math.ceil((RM.t0-now())/1000);if(l<=0){clearInterval(cdT);cdT=0;if(isHost)ref.update({state:'load'});if(!started)startGame(RM)}else ui(`<div class="cd" id="cdn">${l}</div>`)},100)}
-else if(r.state!='cd'&&!cdT){if(!started)startGame(r);else phase(r)}}
+function onRoom(s){
+  const r=s.val();
+  if(!r){cleanup();leaveG();dlg('<p>Room ditutup oleh host.</p>',[['OK',menu]]);return}
+  if(!isHost&&!(r.players&&r.players[uid])){cleanup();leaveG();dlg('<p>Kamu dikeluarkan dari room.</p>',[['OK',menu]]);return}
+  RM=r;
+  if(r.state=='lobby'){if(mode=='game'){leaveG();started=0}mode='lobby';lobby(r)}
+  else if(r.state=='cd'&&!cdT){
+    mode='cd';
+    cdT=setInterval(()=>{
+      const l=Math.ceil((RM.t0-now())/1000);
+      if(l<=0){clearInterval(cdT);cdT=0;if(isHost)ref.update({state:'load'});if(!started)startGame(RM)}
+      else ui(`<div class="cd" id="cdn">${l}</div>`)
+    },100)
+  }
+  else if(r.state!='cd'&&!cdT){if(!started)startGame(r);else phase(r)}
+}
 function lobby(r){const pl=Object.entries(r.players||{}),all=pl.length>0&&pl.every(([,p])=>p.r),me=(r.players||{})[uid];
 ui(`<div class="lb"><div class="pn" style="font:600 16px var(--px)">KODE ROOM: <span style="color:#1e6fd0;letter-spacing:4px">${code}</span> &nbsp; ${r.mode=='g'?'Kelompok ('+r.groups+')':'Tanpa kelompok'} &nbsp; ${r.dur} mnt</div>
 <div class="hc">${jsvg(r.hc,r.ha,150)}<div style="font:600 16px var(--px);margin-top:8px">${esc(r.hn)}</div><div style="font:600 12px var(--px);color:#e53935;margin-top:6px">HOST</div></div>
 <div class="pl">${pl.map(([k,p])=>`<div class="pc">${isHost?`<button class="x" data-k="${k}">x</button>`:''}${jsvg(p.c,p.a,70)}<br>${esc(p.n)}<br>${r.mode=='g'?'Kelompok '+p.g+'<br>':''}<span style="color:${p.r?'#2e9e4f':'#999'}">${p.r?'SIAP':'Belum siap'}</span></div>`).join('')||'<div class="pn">Menunggu pemain...</div>'}</div>
 <div class="row" style="pointer-events:auto">${isHost?`<button class="b y" id="go" ${all?'':'disabled'}>Mulai</button>`:`<button class="b ${me&&me.r?'on':'y'}" id="rd">${me&&me.r?'Batal Siap':'Siap'}</button>`}<button class="b" id="lv">Keluar</button></div></div>`);
 document.querySelectorAll('.x').forEach(b=>b.onclick=()=>ref.child('players/'+b.dataset.k).remove());
-if(isHost)$('#go').onclick=()=>{if(all)ref.update({state:'cd',t0:now()+5000})};else $('#rd').onclick=()=>ref.child('players/'+uid+'/r').set(me&&me.r?0:1);
+if(isHost)$('#go').onclick=()=>{if(all)ref.update({state:'cd',t0:now()+5000})};
+else $('#rd').onclick=()=>ref.child('players/'+uid+'/r').set(me&&me.r?0:1);
 $('#lv').onclick=leaveRoom}
-function leaveRoom(){if(ref){if(isHost)ref.remove();else ref.child('players/'+uid).remove()}cleanup();leaveG();menu()}
+function leaveRoom(){
+  if(ref){
+    /* Lepas onDisconnect SEBELUM remove, agar tidak bentrok */
+    try{ref.child('players/'+uid).onDisconnect().cancel()}catch(e){}
+    if(isHost)ref.remove();else ref.child('players/'+uid).remove()
+  }
+  cleanup();leaveG();menu()
+}
 /* ---------- Game scene ---------- */
 const ftex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.fillStyle='#e6fbee';x.fillRect(0,0,64,64);x.fillStyle='#cdf1db';x.fillRect(0,0,32,32);x.fillRect(32,32,32,32);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(20,20);t.magFilter=THREE.NearestFilter;return t})();
 function setGame(){sG.background=new THREE.Color(0xbfe8ff);const f=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.MeshStandardMaterial({map:ftex}));f.name='f0';f.rotation.x=-Math.PI/2;f.receiveShadow=true;sG.add(f);
@@ -422,13 +495,25 @@ function buildFloors(){FG=new THREE.Group();const f0=sG.getObjectByName('f0');if
 for(let i=0;i<nSlots;i++){const f=new THREE.Mesh(new THREE.PlaneGeometry(44,40),fm);f.rotation.x=-Math.PI/2;f.position.x=i*44;f.receiveShadow=true;FG.add(f)}
 const wm=new THREE.MeshStandardMaterial({color:0xffffff,side:2}),lf=new THREE.Mesh(new THREE.PlaneGeometry(36,36),wm);lf.rotation.x=-Math.PI/2;lf.position.set(LX,.02,LZ);lf.receiveShadow=true;FG.add(lf);
 [[0,-18,36,1],[0,18,36,1],[-18,0,1,36],[18,0,1,36]].forEach(([x,z,w,d])=>{const b=new THREE.Mesh(new THREE.BoxGeometry(w,7,d),wm);b.position.set(LX+x,3.5,LZ+z);FG.add(b)});sG.add(FG)}
-function initNet(r){slotInfo(r);buildFloors();hd=r.dur;cs=0;rtRef=db.ref('rt/'+code);rtRef.child('c').on('value',s=>{CV=s.val()||{};applyC()});rtRef.child('p').on('value',onP);rtRef.child('win').on('value',s=>{WN=s.val()||[];drawJudge()});
-rtRef.child('p/'+uid).onDisconnect().remove();if(isHost)rtRef.onDisconnect().remove();
-$('#hn').textContent=hd;$('#hm').onclick=()=>{hd=Math.max(1,hd-1);$('#hn').textContent=hd};$('#hpl').onclick=()=>{hd=Math.min(30,hd+1);$('#hn').textContent=hd};$('#hs').onclick=()=>ref.update({state:'build',t0:now(),dur:hd});
-$('#cL').onclick=()=>{cs=(cs+nSlots-1)%nSlots};$('#cR').onclick=()=>{cs=(cs+1)%nSlots};phase(r)}
+function initNet(r){
+  slotInfo(r);buildFloors();hd=r.dur;cs=0;
+  rtRef=db.ref('rt/'+code);
+  rtRef.child('c').on('value',s=>{CV=s.val()||{};applyC()});
+  rtRef.child('p').on('value',onP);
+  rtRef.child('win').on('value',s=>{WN=s.val()||[];drawJudge()});
+  /* onDisconnect HANYA untuk node pemain, JANGAN untuk root rt/<code> */
+  rtRef.child('p/'+uid).onDisconnect().remove();
+  $('#hn').textContent=hd;
+  $('#hm').onclick=()=>{hd=Math.max(1,hd-1);$('#hn').textContent=hd};
+  $('#hpl').onclick=()=>{hd=Math.min(30,hd+1);$('#hn').textContent=hd};
+  $('#hs').onclick=()=>ref.update({state:'build',t0:now(),dur:hd});
+  $('#cL').onclick=()=>{cs=(cs+nSlots-1)%nSlots};
+  $('#cR').onclick=()=>{cs=(cs+1)%nSlots};
+  phase(r)
+}
 function phase(r){const np=(r.state=='build'||r.state=='judge')?r.state:'load';if(np==curPh)return;curPh=ph=np;ended=0;tEnd=np=='build'?r.t0+r.dur*60000:0;tool=0;if(carry){sG.remove(carry.m);carry=null}updTool();hudFor(np=='build'&&!isHost);
 $('#hp').style.display=isHost&&np=='load'?'block':'none';$('#cc').style.display=isHost&&np=='build'?'block':'none';$('#top').style.display='block';
-if(isHost&&np!='judge'&&rtRef)rtRef.child('p/'+uid).remove();
+/* JANGAN remove node host di sini — cukup bersihkan posisi saat masuk build */
 if(np=='load'){clearAll();WN=[];Bd={a:LX-17,b:LX+17,c:LZ-17,d:LZ+17};P.pos.set(LX+rnd(-6,6),0,LZ+rnd(-6,6))}
 if(np=='build'){clearAll();lastS='';if(!isHost){Bd={a:mySlot*44-19,b:mySlot*44+19,c:-19,d:19};P.pos.set(mySlot*44,0,6)}}
 if(np=='judge'){Bd={a:-22,b:nSlots*44-22,c:-22,d:22};P.pos.set(isHost?0:mySlot*44,0,12)}
@@ -450,8 +535,21 @@ for(let i=0;i<nSlots;i++){const x=i*44,n=lbl(SN[i],'#0d2a55',2.2);n.position.set
 if(isHost){JG.add(M(new THREE.CylinderGeometry(.9,1,.4,12),r>=0?0xffd21f:0x22cc66,x,.2,10));const t=lbl('PILIH','#0d2a55',1.2);t.position.set(x,1.5,10);JG.add(t);SB.push({s:i,x,z:10})}}sG.add(JG)}
 function pick(i){if(WN.includes(i))return;WN=WN.concat(i);rtRef.child('win').set(WN);
 dlg('<h3>Juara '+WN.length+': '+esc(SN[i])+'</h3><p>Pilih lagi untuk juara berikutnya, main lagi, atau berhenti.</p>',[['Pilih Lagi'],['Main Lagi',()=>{rtRef.child('c').remove();rtRef.child('win').remove();ref.update({state:'load'})}],['Berhenti Main',()=>{const u={state:'lobby'};Object.keys(RM.players||{}).forEach(k=>u['players/'+k+'/r']=0);rtRef.remove();ref.update(u)},'y']])}
-function endNet(){if(rtRef){rtRef.child('c').off();rtRef.child('p').off();rtRef.child('win').off();if(isHost)rtRef.remove().catch(()=>{});else rtRef.child('p/'+uid).remove().catch(()=>{});rtRef=null}
-for(const k in RP)sG.remove(RP[k].g,RP[k].t);RP={};if(FG){sG.remove(FG);FG=null}if(JG){sG.remove(JG);JG=null}const f=sG.getObjectByName('f0');if(f)f.visible=true;const rm1=sG.getObjectByName('rim');if(rm1)rm1.visible=true;clearAll();ph='solo';curPh=0;mySlot=0;Bd={a:-19,b:19,c:-19,d:19};WN=[];CV={};SB=[];$('#hp').style.display='none';$('#cc').style.display='none'}
+function endNet(){
+  if(rtRef){
+    try{rtRef.child('p/'+uid).onDisconnect().cancel()}catch(e){}
+    rtRef.child('c').off();rtRef.child('p').off();rtRef.child('win').off();
+    if(isHost)rtRef.remove().catch(()=>{});else rtRef.child('p/'+uid).remove().catch(()=>{});
+    rtRef=null;
+  }
+  for(const k in RP)sG.remove(RP[k].g,RP[k].t);RP={};
+  if(FG){sG.remove(FG);FG=null}
+  if(JG){sG.remove(JG);JG=null}
+  const f=sG.getObjectByName('f0');if(f)f.visible=true;
+  const rm1=sG.getObjectByName('rim');if(rm1)rm1.visible=true;
+  clearAll();ph='solo';curPh=0;mySlot=0;Bd={a:-19,b:19,c:-19,d:19};WN=[];CV={};SB=[];
+  $('#hp').style.display='none';$('#cc').style.display='none';
+}
 function hudTxt(){const T=$('#top');if(ph=='solo')return;
 if(ph=='load')T.textContent=isHost?'RUANG TUNGGU':'RUANG TUNGGU - menunggu host';else if(ph=='judge')T.textContent='PENILAIAN';
 else{const l=tEnd-now();T.textContent=l>0?'WAKTU '+String(Math.floor(l/60000)).padStart(2,'0')+':'+String(Math.floor(l/1000)%60).padStart(2,'0'):'WAKTU HABIS';if(l<=0&&!ended&&isHost){ended=1;ref.update({state:'judge'})}if(isHost)$('#cn').textContent=SN[cs]||''}}
