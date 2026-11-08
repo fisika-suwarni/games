@@ -126,7 +126,7 @@ input[type=range]{width:100%;height:30px;accent-color:var(--s);touch-action:auto
 if(!window.THREE){document.body.insertAdjacentHTML('beforeend','<div id="nolib">Gagal memuat three.js.<br>Hubungkan internet sekali, atau taruh three.min.js (r128) di folder lib/</div>');return}
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const cfg={apiKey:"AIzaSyCU0hMMG0ZcY-sUcVYJoR2Z_Lvz_rObomk",authDomain:"fisika-suwarni.firebaseapp.com",
- databaseURL:"https://fisika-suwarni-default-rtdb.firebaseio.com",projectId:"fisika-suwarni",storageBucket:"fisika-suwarni.firebasestorage.app",messagingSenderId:"163597182103",appId:"1:163597182103:web:3fa3d53a9022af791ff5d2"};
+ databaseURL:"https://fisika-suwarni-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"fisika-suwarni",storageBucket:"fisika-suwarni.firebasestorage.app",messagingSenderId:"163597182103",appId:"1:163597182103:web:3fa3d53a9022af791ff5d2"};
 let S=Object.assign({color:'#4fc3f7',acc:0,gfx:2},JSON.parse(localStorage.fx||'{}'));const save=()=>localStorage.fx=JSON.stringify(S);
 let fb=!!window.firebase,authErr=null,auth,db,uid='lokal-'+Math.random().toString(36).slice(2,8),off=0;
 if(fb){try{firebase.initializeApp(cfg);auth=firebase.auth();db=firebase.database();db.ref('.info/serverTimeOffset').on('value',s=>off=s.val()||0)}catch(e){fb=false;console.error('Firebase init error:',e)}}
